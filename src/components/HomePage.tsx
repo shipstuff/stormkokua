@@ -10,6 +10,8 @@ import { FamilyModal } from "./FamilyModal";
 interface Stats {
   totalFamilies: number;
   totalRaised: number;
+  familyRaised: number;
+  overallFundRaised: number;
   trackedFamilies: number;
   islands: { island: string; count: number }[];
   areas: { area: string; count: number }[];
@@ -25,10 +27,13 @@ export function HomePage({
 }) {
   const [selectedIsland, setSelectedIsland] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortOrder, setSortOrder] = useState<
+    "default" | "amount-asc" | "amount-desc"
+  >("default");
   const [selectedFamily, setSelectedFamily] = useState<Family | null>(null);
 
   const filtered = useMemo(() => {
-    let results = initialFamilies;
+    let results = [...initialFamilies];
 
     if (selectedIsland) {
       results = results.filter((f) => f.island === selectedIsland);
@@ -47,8 +52,28 @@ export function HomePage({
       );
     }
 
+    if (sortOrder !== "default") {
+      results.sort((a, b) => {
+        const aAmount = a.amount_raised;
+        const bAmount = b.amount_raised;
+
+        if (aAmount === null && bAmount === null) {
+          return a.name.localeCompare(b.name);
+        }
+
+        if (aAmount === null) return 1;
+        if (bAmount === null) return -1;
+
+        if (sortOrder === "amount-asc") {
+          return aAmount - bAmount || a.name.localeCompare(b.name);
+        }
+
+        return bAmount - aAmount || a.name.localeCompare(b.name);
+      });
+    }
+
     return results;
-  }, [initialFamilies, selectedIsland, searchQuery]);
+  }, [initialFamilies, searchQuery, selectedIsland, sortOrder]);
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -58,8 +83,10 @@ export function HomePage({
         islands={initialStats.islands}
         selectedIsland={selectedIsland}
         searchQuery={searchQuery}
+        sortOrder={sortOrder}
         onIslandChange={setSelectedIsland}
         onSearchChange={setSearchQuery}
+        onSortChange={setSortOrder}
         resultCount={filtered.length}
       />
 

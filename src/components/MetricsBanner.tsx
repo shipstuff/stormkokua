@@ -1,10 +1,16 @@
 "use client";
 
-import { STORMKOKUA_FORM_URL, STORMKOKUA_SHEET_URL } from "@/lib/links";
+import {
+  STORMKOKUA_FORM_URL,
+  STORMKOKUA_OVERALL_FUND_URL,
+  STORMKOKUA_SHEET_URL,
+} from "@/lib/links";
 
 interface Stats {
   totalFamilies: number;
   totalRaised: number;
+  familyRaised: number;
+  overallFundRaised: number;
   trackedFamilies: number;
   islands: { island: string; count: number }[];
   lastSync: string | null;
@@ -16,6 +22,11 @@ export function MetricsBanner({ stats }: { stats: Stats }) {
     currency: "USD",
     maximumFractionDigits: 0,
   }).format(stats.totalRaised);
+  const formattedOverallFundRaised = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(stats.overallFundRaised);
 
   return (
     <section className="relative overflow-hidden bg-ocean-950 text-white">
@@ -56,6 +67,14 @@ export function MetricsBanner({ stats }: { stats: Stats }) {
             >
               Submit Family Information
             </a>
+            <a
+              href={STORMKOKUA_OVERALL_FUND_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-full bg-lava-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-lava-950/20 transition hover:bg-lava-600"
+            >
+              Donate To Overall Fund
+            </a>
             {stats.lastSync && (
               <span className="rounded-full border border-white/10 bg-ocean-900/60 px-4 py-2 text-sm text-ocean-200">
                 Last synced{" "}
@@ -84,9 +103,11 @@ export function MetricsBanner({ stats }: { stats: Stats }) {
           ))}
         </div>
         <p className="mx-auto mt-4 max-w-3xl text-center text-xs leading-6 text-ocean-300">
-          Estimated raised is based on {stats.trackedFamilies} public GoFundMe
-          totals from the source sheet. Venmo, CashApp, SpotFund, and direct
-          website totals are usually not public.
+          {stats.overallFundRaised > 0
+            ? `Estimated raised includes ${formattedOverallFundRaised} from the overall GoFundMe relief fund, plus ${stats.trackedFamilies} public family GoFundMe totals from the source sheet.`
+            : `Estimated raised is based on ${stats.trackedFamilies} public family GoFundMe totals from the source sheet.`}{" "}
+          Venmo, CashApp, SpotFund, and direct website totals are usually not
+          public.
         </p>
 
         {/* CTA */}

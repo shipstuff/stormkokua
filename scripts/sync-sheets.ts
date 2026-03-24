@@ -8,9 +8,11 @@ import {
   getDb,
   logSync,
   replaceFamilies,
+  setSyncNumber,
   type FamilyInput,
   type RelatedLink,
 } from "../src/lib/db";
+import { STORMKOKUA_OVERALL_FUND_URL } from "../src/lib/links";
 import { mkdirSync } from "fs";
 import { join } from "path";
 
@@ -23,6 +25,7 @@ const SHEET_GIDS = {
 const VERIFIED_JSON_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GIDS.verified}`;
 const VERIFIED_HTML_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/htmlview/sheet?headers=true&gid=${SHEET_GIDS.verified}`;
 const GOFUNDME_JSON_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GIDS.sortedGoFundMes}`;
+const OVERALL_FUND_AMOUNT_KEY = "overall_gofundme_amount";
 
 const MAIN_HEADER_ROW = ["ʻOhana", "Donation Link", "Description", "Area"];
 
@@ -400,6 +403,24 @@ function parseGoFundMeAmounts(rawJson: string): Map<string, number> {
   return amounts;
 }
 
+function parseOverallFundAmount(html: string): number {
+  const match = html.match(
+    /"currentAmount":\{"__typename":"Money","amount":(\d+),"currencyCode":"USD"\}/
+  );
+
+  if (!match) {
+    throw new Error("Failed to locate the overall GoFundMe fund amount");
+  }
+
+  const amount = Number(match[1]);
+
+  if (!Number.isFinite(amount)) {
+    throw new Error("Overall GoFundMe fund amount was not numeric");
+  }
+
+  return amount;
+}
+
 function normalizeIsland(rawIsland: string): string {
   const island = rawIsland.trim();
 
@@ -475,15 +496,38 @@ function buildFamilies(
   });
 }
 
+async function fetchOverallFundAmount(): Promise<number> {
+  const response = await fetch(STORMKOKUA_OVERALL_FUND_URL);
+
+  if (!response.ok) {
+    throw new Error(`Overall GoFundMe page returned ${response.status}`);
+  }
+
+  return parseOverallFundAmount(await response.text());
+}
+
 async function syncSheet() {
   console.log("Fetching Google Sheet data...");
 
-  const [verifiedJsonResponse, verifiedHtmlResponse, goFundMeJsonResponse] =
-    await Promise.all([
-      fetch(VERIFIED_JSON_URL),
-      fetch(VERIFIED_HTML_URL),
-      fetch(GOFUNDME_JSON_URL),
-    ]);
+  const overallFundAmountPromise = fetchOverallFundAmount().catch((error) => {
+    console.warn(
+      "Failed to refresh overall GoFundMe fund amount:",
+      error instanceof Error ? error.message : error
+    );
+    return null;
+  });
+
+  const [
+    verifiedJsonResponse,
+    verifiedHtmlResponse,
+    goFundMeJsonResponse,
+    overallFundAmount,
+  ] = await Promise.all([
+    fetch(VERIFIED_JSON_URL),
+    fetch(VERIFIED_HTML_URL),
+    fetch(GOFUNDME_JSON_URL),
+    overallFundAmountPromise,
+  ]);
 
   if (!verifiedJsonResponse.ok || !verifiedHtmlResponse.ok || !goFundMeJsonResponse.ok) {
     throw new Error("Failed to fetch one or more Google Sheet views");
@@ -505,6 +549,11 @@ async function syncSheet() {
   }
 
   replaceFamilies(families);
+
+  if (overallFundAmount !== null) {
+    setSyncNumber(OVERALL_FUND_AMOUNT_KEY, overallFundAmount);
+  }
+
   logSync(families.length, "success");
 
   const linkedFamilies = families.filter((family) => family.donation_link).length;
@@ -513,7 +562,15 @@ async function syncSheet() {
   ).length;
 
   console.log(
-    `Synced ${families.length} families successfully (${linkedFamilies} direct links, ${trackedAmounts} tracked amounts)`
+    `Synced ${families.length} families successfully (${linkedFamilies} direct links, ${trackedAmounts} tracked amounts${
+      overallFundAmount !== null
+        ? `, overall fund ${overallFundAmount.toLocaleString("en-US", {
+            style: "currency",
+            currency: "USD",
+            maximumFractionDigits: 0,
+          })}`
+        : ""
+    })`
   );
 }
 

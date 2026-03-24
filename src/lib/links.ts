@@ -3,3 +3,6 @@ export const STORMKOKUA_SHEET_URL =
 
 export const STORMKOKUA_FORM_URL =
   "https://docs.google.com/forms/d/e/1FAIpQLScfH7Hjq5G_vBYklTv51K0ccWhte5eBTrfSQ06gmmlaTuhUGg/viewform";
+
+export const STORMKOKUA_OVERALL_FUND_URL =
+  "https://www.gofundme.com/f/2026-flood-relief-fund";

@@ -4,8 +4,10 @@ interface FilterBarProps {
   islands: { island: string; count: number }[];
   selectedIsland: string;
   searchQuery: string;
+  sortOrder: "default" | "amount-asc" | "amount-desc";
   onIslandChange: (island: string) => void;
   onSearchChange: (query: string) => void;
+  onSortChange: (sortOrder: "default" | "amount-asc" | "amount-desc") => void;
   resultCount: number;
 }
 
@@ -13,8 +15,10 @@ export function FilterBar({
   islands,
   selectedIsland,
   searchQuery,
+  sortOrder,
   onIslandChange,
   onSearchChange,
+  onSortChange,
   resultCount,
 }: FilterBarProps) {
   return (
@@ -48,7 +52,40 @@ export function FilterBar({
             ))}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="relative">
+              <svg
+                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 7.5h13.5M3 12h9m-9 4.5h6m9-12v15m0 0l3-3m-3 3l-3-3" />
+              </svg>
+              <select
+                value={sortOrder}
+                onChange={(e) =>
+                  onSortChange(
+                    e.target.value as "default" | "amount-asc" | "amount-desc"
+                  )
+                }
+                className="w-full appearance-none rounded-full border border-slate-200 bg-slate-50 py-2 pl-10 pr-9 text-sm text-slate-700 focus:border-ocean-500 focus:outline-none focus:ring-2 focus:ring-ocean-500/20 focus:bg-white sm:w-52"
+              >
+                <option value="default">Sort: Name</option>
+                <option value="amount-asc">Amount: Low to High</option>
+                <option value="amount-desc">Amount: High to Low</option>
+              </select>
+              <svg
+                className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25L12 15.75 4.5 8.25" />
+              </svg>
+            </div>
             <div className="relative">
               <svg
                 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
