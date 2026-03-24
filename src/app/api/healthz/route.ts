@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { withMetrics } from "@/lib/metrics";
 
-export async function GET() {
+export const GET = withMetrics("/api/healthz", async (_req: NextRequest) => {
   try {
     const db = getDb();
     db.prepare("SELECT 1").get();
@@ -9,4 +10,4 @@ export async function GET() {
   } catch {
     return NextResponse.json({ status: "error" }, { status: 500 });
   }
-}
+});
