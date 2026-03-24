@@ -5,9 +5,12 @@ import type { Family } from "@/lib/db";
 import { MetricsBanner } from "./MetricsBanner";
 import { FilterBar } from "./FilterBar";
 import { FamilyCard } from "./FamilyCard";
+import { FamilyModal } from "./FamilyModal";
 
 interface Stats {
   totalFamilies: number;
+  totalRaised: number;
+  trackedFamilies: number;
   islands: { island: string; count: number }[];
   areas: { area: string; count: number }[];
   lastSync: string | null;
@@ -22,6 +25,7 @@ export function HomePage({
 }) {
   const [selectedIsland, setSelectedIsland] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedFamily, setSelectedFamily] = useState<Family | null>(null);
 
   const filtered = useMemo(() => {
     let results = initialFamilies;
@@ -37,7 +41,9 @@ export function HomePage({
           f.name.toLowerCase().includes(q) ||
           (f.area && f.area.toLowerCase().includes(q)) ||
           (f.neighborhood && f.neighborhood.toLowerCase().includes(q)) ||
-          (f.description && f.description.toLowerCase().includes(q))
+          (f.description && f.description.toLowerCase().includes(q)) ||
+          (f.donation_handle && f.donation_handle.toLowerCase().includes(q)) ||
+          f.related_links.some((link) => link.label.toLowerCase().includes(q))
       );
     }
 
@@ -60,7 +66,11 @@ export function HomePage({
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((family) => (
-            <FamilyCard key={family.id} family={family} />
+            <FamilyCard
+              key={family.id}
+              family={family}
+              onSelect={setSelectedFamily}
+            />
           ))}
         </div>
 
@@ -92,27 +102,13 @@ export function HomePage({
               })}
             </p>
           )}
-          <div className="mt-4 flex items-center justify-center gap-4 text-xs">
-            <a
-              href="https://bit.ly/stormkokua"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-ocean-600 font-medium hover:text-ocean-800 transition-colors"
-            >
-              Original Spreadsheet
-            </a>
-            <span className="text-slate-300">|</span>
-            <a
-              href="https://github.com/shipstuff/stormkokua"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-ocean-600 font-medium hover:text-ocean-800 transition-colors"
-            >
-              Contribute on GitHub
-            </a>
-          </div>
         </div>
       </footer>
+
+      <FamilyModal
+        family={selectedFamily}
+        onClose={() => setSelectedFamily(null)}
+      />
     </main>
   );
 }
