@@ -1,5 +1,6 @@
 import { Registry, Counter, Histogram, Gauge, collectDefaultMetrics } from "prom-client";
 import { NextRequest, NextResponse } from "next/server";
+import { log } from "@/lib/logger";
 
 const register = new Registry();
 
@@ -42,12 +43,27 @@ export function withMetrics(
         route,
         status_code: res.status,
       });
+      log.info("request", {
+        method: req.method,
+        route,
+        status: res.status,
+        duration_ms: Math.round(duration * 1000),
+      });
       return res;
     } catch (err) {
       const duration = (Date.now() - start) / 1000;
       httpRequestDuration.observe({ method: req.method, route }, duration);
       httpRequestsTotal.inc({ method: req.method, route, status_code: 500 });
-      throw err;
+      log.error("request failed", {
+        method: req.method,
+        route,
+        duration_ms: Math.round(duration * 1000),
+        error: err instanceof Error ? err.message : String(err),
+      });
+      return NextResponse.json(
+        { error: "Internal server error" },
+        { status: 500 },
+      );
     } finally {
       httpInFlightRequests.dec();
     }
