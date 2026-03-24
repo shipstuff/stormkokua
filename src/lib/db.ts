@@ -37,6 +37,12 @@ function initSchema(db: Database.Database) {
       rows_synced INTEGER,
       status TEXT
     );
+
+    CREATE TABLE IF NOT EXISTS sync_state (
+      key TEXT PRIMARY KEY,
+      number_value REAL,
+      updated_at TEXT DEFAULT (datetime('now'))
+    );
   `);
 
   ensureFamilyColumn(db, "amount_raised", "REAL");
@@ -173,10 +179,13 @@ export function getStats() {
       "SELECT synced_at FROM sync_log ORDER BY synced_at DESC LIMIT 1"
     )
     .get() as { synced_at: string } | undefined;
+  const overallFundRaised = getSyncNumber("overall_gofundme_amount") ?? 0;
 
   return {
     totalFamilies: total.count,
-    totalRaised: raised.totalRaised,
+    totalRaised: raised.totalRaised + overallFundRaised,
+    familyRaised: raised.totalRaised,
+    overallFundRaised,
     trackedFamilies: raised.trackedFamilies,
     islands,
     areas,
@@ -257,4 +266,24 @@ export function logSync(rowsSynced: number, status: string) {
   db.prepare(
     "INSERT INTO sync_log (rows_synced, status) VALUES (?, ?)"
   ).run(rowsSynced, status);
+}
+
+export function setSyncNumber(key: string, value: number) {
+  const db = getDb();
+  db.prepare(
+    `INSERT INTO sync_state (key, number_value, updated_at)
+     VALUES (?, ?, datetime('now'))
+     ON CONFLICT(key) DO UPDATE SET
+       number_value = excluded.number_value,
+       updated_at = excluded.updated_at`
+  ).run(key, value);
+}
+
+function getSyncNumber(key: string): number | null {
+  const db = getDb();
+  const row = db
+    .prepare("SELECT number_value FROM sync_state WHERE key = ?")
+    .get(key) as { number_value: number | null } | undefined;
+
+  return row?.number_value ?? null;
 }
