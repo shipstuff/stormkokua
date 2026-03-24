@@ -1,11 +1,22 @@
 "use client";
 
+import { STORMKOKUA_FORM_URL, STORMKOKUA_SHEET_URL } from "@/lib/links";
+
 interface Stats {
   totalFamilies: number;
+  totalRaised: number;
+  trackedFamilies: number;
   islands: { island: string; count: number }[];
+  lastSync: string | null;
 }
 
 export function MetricsBanner({ stats }: { stats: Stats }) {
+  const formattedRaised = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(stats.totalRaised);
+
   return (
     <section className="relative overflow-hidden bg-ocean-950 text-white">
       {/* Subtle wave overlay */}
@@ -28,11 +39,41 @@ export function MetricsBanner({ stats }: { stats: Stats }) {
             Families, farms, and businesses across Hawai&#699;i were devastated by
             the Kona Low storms. They need our help.
           </p>
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+            <a
+              href={STORMKOKUA_SHEET_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/15"
+            >
+              Open Original Spreadsheet
+            </a>
+            <a
+              href={STORMKOKUA_FORM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-full border border-lava-300/30 bg-lava-500/20 px-4 py-2 text-sm font-semibold text-lava-50 transition hover:bg-lava-500/30"
+            >
+              Submit Family Information
+            </a>
+            {stats.lastSync && (
+              <span className="rounded-full border border-white/10 bg-ocean-900/60 px-4 py-2 text-sm text-ocean-200">
+                Last synced{" "}
+                {new Date(stats.lastSync + "Z").toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  hour: "numeric",
+                  minute: "2-digit",
+                })}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Stats row */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-5 max-w-3xl mx-auto">
+        <div className="mx-auto grid max-w-5xl grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 sm:gap-5">
           <StatCard value={stats.totalFamilies} label="Families in need" accent />
+          <StatCard value={formattedRaised} label="Estimated raised" />
           <StatCard value={stats.islands.length} label="Islands affected" />
           {stats.islands.slice(0, 2).map((island) => (
             <StatCard
@@ -42,6 +83,11 @@ export function MetricsBanner({ stats }: { stats: Stats }) {
             />
           ))}
         </div>
+        <p className="mx-auto mt-4 max-w-3xl text-center text-xs leading-6 text-ocean-300">
+          Estimated raised is based on {stats.trackedFamilies} public GoFundMe
+          totals from the source sheet. Venmo, CashApp, SpotFund, and direct
+          website totals are usually not public.
+        </p>
 
         {/* CTA */}
         <div className="mt-8 text-center">
@@ -65,7 +111,7 @@ function StatCard({
   label,
   accent,
 }: {
-  value: number;
+  value: number | string;
   label: string;
   accent?: boolean;
 }) {
