@@ -4,11 +4,14 @@ import { HomePage } from "@/components/HomePage";
 
 export async function generateMetadata(): Promise<Metadata> {
   const stats = getStats();
+  const modifiedTime = stats.lastSync
+    ? new Date(stats.lastSync + "Z").toISOString()
+    : new Date().toISOString();
+
   return {
-    other: {
-      "article:modified_time": stats.lastSync
-        ? new Date(stats.lastSync + "Z").toISOString()
-        : new Date().toISOString(),
+    openGraph: {
+      type: "article",
+      modifiedTime,
     },
   };
 }
