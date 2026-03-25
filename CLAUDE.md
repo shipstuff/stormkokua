@@ -99,6 +99,17 @@ scripts/
 - **Host**: shipstuff.fun VPS (Digital Ocean), user `stormkokua`
 - **Domain**: stormkokua.com
 - **Config**: `servertimeai/cloud/hosts.yaml` under `stormkokua`
-- **Deploy**: Legacy poll mode -- run-server.sh polls git, rebuilds on new commits
+- **Deploy**: Legacy poll mode -- run-server.sh polls git every 60s, runs `npm run build:prod` on new commits
+- **Static assets**: nginx serves `/_next/static/` from `/var/www/html/stormkokua/_next/static/` (rsynced from `.next/static/` after each build)
 - **DB path**: `/home/stormkokua/app/data/stormkokua.db`
 - **Backups**: `/backups/stormkokua/`
+- **Force refresh**: `sudo -u stormkokua touch /tmp/stormkokua_force_refresh`
+
+### Ansible provisioning
+
+```bash
+cd servertimeai/cloud
+ansible-run ansible-playbook playbook.yaml -e @secrets.enc --limit stormkokua --skip-tags dns
+```
+
+After Ansible updates `run-server.sh`, the running script must be restarted (Ansible doesn't restart the tmux session with `--limit`). If Node version changes, run `npm install --include=dev` before the next build to recompile native modules (better-sqlite3).
