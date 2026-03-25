@@ -32,7 +32,9 @@ export function HomePage({
   >("default");
   const [selectedFamily, setSelectedFamily] = useState<Family | null>(null);
 
-  const SITE_TITLE = "Storm Kokua - Kona Low Storm Relief for Hawai'i";
+  const [defaultTitle] = useState(() =>
+    typeof document !== "undefined" ? document.title : ""
+  );
 
   const openFamily = useCallback((family: Family) => {
     setSelectedFamily(family);
@@ -42,9 +44,9 @@ export function HomePage({
 
   const closeFamily = useCallback(() => {
     setSelectedFamily(null);
-    document.title = SITE_TITLE;
+    document.title = defaultTitle;
     window.history.pushState({}, "", "/");
-  }, []);
+  }, [defaultTitle]);
 
   // Read family ID from URL on mount (supports /family/123 and ?family=123)
   useEffect(() => {
