@@ -32,15 +32,21 @@ export function HomePage({
   >("default");
   const [selectedFamily, setSelectedFamily] = useState<Family | null>(null);
 
+  const [defaultTitle] = useState(() =>
+    typeof document !== "undefined" ? document.title : ""
+  );
+
   const openFamily = useCallback((family: Family) => {
     setSelectedFamily(family);
+    document.title = `Help ${family.name} | Storm Kokua`;
     window.history.pushState({}, "", `/family/${family.id}`);
   }, []);
 
   const closeFamily = useCallback(() => {
     setSelectedFamily(null);
+    document.title = defaultTitle;
     window.history.pushState({}, "", "/");
-  }, []);
+  }, [defaultTitle]);
 
   // Read family ID from URL on mount (supports /family/123 and ?family=123)
   useEffect(() => {
@@ -50,7 +56,7 @@ export function HomePage({
       const family = initialFamilies.find((f) => f.id === Number(familyId));
       if (family) {
         setSelectedFamily(family);
-        // Converge ?family= URLs to clean /family/{id} path for sharing
+        // Converge old ?family= URLs to /family/{id} for sharing
         if (!pathMatch) {
           window.history.replaceState({}, "", `/family/${family.id}`);
         }
