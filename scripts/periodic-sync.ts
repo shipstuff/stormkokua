@@ -8,24 +8,30 @@
  */
 
 import { createServer } from "http";
-import { execSync } from "child_process";
-import { writeFileSync } from "fs";
+import { writeFileSync, mkdirSync } from "fs";
+import { join } from "path";
+import { getDb } from "../src/lib/db";
+import { syncSheet } from "./sync-sheets";
 
 const INTERVAL_MS = 30 * 60 * 1000;
 const PORT = Number(process.env.PORT) || 3000;
 const SERVICE_NAME = process.env.SERVICE_NAME || "stormkokua";
 const FLAG_PATH = `/tmp/${SERVICE_NAME}_force_refresh`;
 
+// Ensure DB is ready before first sync
+mkdirSync(join(process.cwd(), "data"), { recursive: true });
+getDb();
+
 let lastSyncAt: Date | null = null;
 let nextSyncAt = new Date(Date.now() + INTERVAL_MS);
 let syncing = false;
 
-function sync() {
+async function sync() {
   const ts = new Date().toISOString();
   console.log(`[${ts}] Starting periodic sync`);
   syncing = true;
   try {
-    execSync("npm run db:sync", { stdio: "inherit" });
+    await syncSheet();
     writeFileSync(FLAG_PATH, "");
     lastSyncAt = new Date();
     console.log(`[${ts}] Sync complete, flagged rebuild`);
