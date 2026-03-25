@@ -2,16 +2,17 @@
 
 ## Project Overview
 
-**stormkokua** is a Next.js disaster relief app for families affected by the Kona Low storms across Hawai'i. It lets people browse and donate to displaced families. Data is synced from a community-maintained Google Sheet into a local SQLite database.
+**stormkokua** is a Next.js static site for families affected by the Kona Low storms across Hawai'i. It lets people browse and donate to displaced families. Data is synced from a community-maintained Google Sheet into a local SQLite database, then the entire site is exported as static HTML/CSS/JS.
 
 Live at **stormkokua.com**, deployed on the shipstuff.fun VPS (Digital Ocean).
 
 ## Tech Stack
 
-- **Framework**: Next.js 15 (App Router, Turbopack dev server)
+- **Framework**: Next.js 15 (App Router, static export via `output: "export"`)
 - **Language**: TypeScript
-- **Database**: SQLite via better-sqlite3 (WAL mode)
+- **Database**: SQLite via better-sqlite3 (WAL mode, build-time only)
 - **Styling**: Tailwind CSS 4
+- **OG Images**: `@vercel/og` (build-time PNG generation)
 - **Node**: 24 (pinned in .nvmrc / .node-version)
 
 ## Getting Started
@@ -23,37 +24,28 @@ npm run db:sync                   # sync Google Sheets data into data/stormkokua
 npm run dev                       # http://localhost:3000
 ```
 
-## Production Build (Standalone)
+## Production Build (Static Export)
 
 ```bash
-npm run build:prod                      # sync sheets + build standalone
-npm run start                     # start standalone server
-npm run db:sync                   # resync sheets data without rebuilding
+npm run build:prod                # sync sheets + build static HTML + generate OG images
+npx serve out                     # preview locally
 ```
 
-The standalone build (`output: "standalone"` in next.config.ts) bundles only the required node_modules (~73MB vs ~644MB full). The VPS deploy loop runs `npm run build:prod` then `npm run start`.
+`build:prod` runs three steps:
+1. `db:sync` -- pull latest data from Google Sheets into SQLite
+2. `build` -- Next.js static export into `out/`
+3. `generate:og` -- render OG PNG images into `out/`
+
+No server process needed in production. nginx serves the `out/` directory directly.
 
 ## Key Routes
 
 | Route | Type | Description |
 |-------|------|-------------|
-| `/` | SSR page | Home page with family cards, filters, stats |
-| `/family/[id]` | SSR page | Shareable link with OG meta, client-side redirect to `/?family=[id]` |
-| `/api/families` | API | GET families, supports `?island=` and `?stats=true` |
-| `/api/healthz` | API | DB connectivity check |
-| `/api/metrics` | API | Prometheus metrics (prom-client) |
-| `/og-image` | API | Dynamic PNG for site-wide OG unfurling |
-| `/family/[id]/og` | API | Dynamic PNG for per-family OG unfurling |
-
-## Metrics
-
-Prometheus metrics exposed at `/api/metrics`:
-- `stormkokua_http_requests_total` (counter: method, route, status_code)
-- `stormkokua_http_request_duration_seconds` (histogram)
-- `stormkokua_http_in_flight_requests` (gauge)
-- Default process metrics (RSS, CPU, event loop, GC)
-
-These feed into the **Shipstuff App Metrics** Grafana dashboard (servertimeai repo).
+| `/` | Static page | Home page with family cards, filters, stats |
+| `/family/[id]` | Static page (SSG) | Shareable link with OG meta, client-side redirect to `/?family=[id]` |
+| `/og-image.png` | Static file | Site-wide OG image |
+| `/family/[id]/og.png` | Static file | Per-family OG image |
 
 ## Data Pipeline
 
@@ -67,41 +59,33 @@ These feed into the **Shipstuff App Metrics** Grafana dashboard (servertimeai re
 ```
 src/
   app/
-    api/families/       # Families data endpoint
-    api/healthz/        # Health check
-    api/metrics/        # Prometheus metrics
-    family/[id]/        # Shareable family page + OG image
-    og-image/           # Site-wide OG image
-    page.tsx            # Home page (SSR)
+    family/[id]/        # Shareable family page (SSG) + client redirect
+    page.tsx            # Home page (static)
     layout.tsx          # Root layout (GA, fonts, OG meta)
   components/           # React client components
   lib/
-    db.ts               # SQLite database layer
-    metrics.ts          # prom-client setup + withMetrics wrapper
+    db.ts               # SQLite database layer (build-time only)
     logger.ts           # Structured logger (JSON prod, readable dev)
     format.ts           # Shared formatting utilities
-  instrumentation.ts    # Process handlers (SIGTERM, SIGINT, uncaught errors)
 scripts/
   sync-sheets.ts        # Google Sheets sync
+  generate-og-images.tsx # Build-time OG image generation (@vercel/og)
 ```
 
 ## Code Standards
 
 - No em dashes in code
 - Keep it simple -- this app serves people in need, reliability over cleverness
-- All API routes use `withMetrics()` wrapper for observability
-- Error handling: `withMetrics` catches thrown errors and returns 500 JSON
 - Structured logging via `src/lib/logger.ts` (JSON in prod, readable in dev)
-- SQLite DB is closed cleanly on SIGTERM/SIGINT via instrumentation.ts
 
 ## Deployment
 
 - **Host**: shipstuff.fun VPS (Digital Ocean), user `stormkokua`
 - **Domain**: stormkokua.com
 - **Config**: `servertimeai/cloud/hosts.yaml` under `stormkokua`
-- **Deploy**: Legacy poll mode -- run-server.sh polls git every 60s, runs `npm run build:prod` on new commits
-- **Static assets**: nginx serves `/_next/static/` from `/var/www/html/stormkokua/_next/static/` (rsynced from `.next/static/` after each build)
-- **DB path**: `/home/stormkokua/app/data/stormkokua.db`
+- **Deploy**: Poll mode -- run-server.sh polls git every 60s, runs `npm run build:prod` on new commits, rsyncs `out/` to nginx
+- **Static assets**: nginx serves the entire site from `/var/www/html/stormkokua/`
+- **DB path**: `/home/stormkokua/app/data/stormkokua.db` (build-time only)
 - **Backups**: `/backups/stormkokua/`
 - **Force refresh**: `sudo -u stormkokua touch /tmp/stormkokua_force_refresh`
 

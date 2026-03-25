@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getFamilyById } from "@/lib/db";
+import { getAllFamilies, getFamilyById } from "@/lib/db";
 import { formatCompactCurrency } from "@/lib/format";
 import { FamilyRedirect } from "./redirect";
 
-export const dynamic = "force-dynamic";
+export async function generateStaticParams() {
+  const families = getAllFamilies();
+  return families.map((f) => ({ id: String(f.id) }));
+}
 
 export async function generateMetadata({
   params,
@@ -36,7 +39,7 @@ export async function generateMetadata({
       siteName: "Storm Kokua",
       images: [
         {
-          url: `/family/${id}/og`,
+          url: `/family/${id}/og.png`,
           width: 1200,
           height: 630,
           alt: `Help ${family.name} - Storm Kokua`,
@@ -47,7 +50,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title,
       description,
-      images: [`/family/${id}/og`],
+      images: [`/family/${id}/og.png`],
     },
   };
 }

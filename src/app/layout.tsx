@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     siteName: "Storm Kokua",
     images: [
       {
-        url: "/og-image",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "Storm Kokua - Kona Low Storm Relief for Hawai'i",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     title: "Storm Kokua - Kona Low Storm Relief",
     description:
       "Families across Hawai'i need your help after the Kona Low storms. Browse and donate.",
-    images: ["/og-image"],
+    images: ["/og-image.png"],
   },
 };
 
