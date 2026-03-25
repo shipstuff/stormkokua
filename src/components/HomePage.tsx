@@ -32,13 +32,17 @@ export function HomePage({
   >("default");
   const [selectedFamily, setSelectedFamily] = useState<Family | null>(null);
 
+  const SITE_TITLE = "Storm Kokua - Kona Low Storm Relief for Hawai'i";
+
   const openFamily = useCallback((family: Family) => {
     setSelectedFamily(family);
+    document.title = `Help ${family.name} | Storm Kokua`;
     window.history.pushState({}, "", `/family/${family.id}`);
   }, []);
 
   const closeFamily = useCallback(() => {
     setSelectedFamily(null);
+    document.title = SITE_TITLE;
     window.history.pushState({}, "", "/");
   }, []);
 
