@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import type { Family } from "@/lib/db";
 import { MetricsBanner } from "./MetricsBanner";
 import { FilterBar } from "./FilterBar";
@@ -21,23 +21,26 @@ interface Stats {
 export function HomePage({
   initialFamilies,
   initialStats,
-  initialFamilyId,
 }: {
   initialFamilies: Family[];
   initialStats: Stats;
-  initialFamilyId?: number;
 }) {
   const [selectedIsland, setSelectedIsland] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<
     "default" | "amount-asc" | "amount-desc"
   >("default");
-  const [selectedFamily, setSelectedFamily] = useState<Family | null>(() => {
-    if (initialFamilyId) {
-      return initialFamilies.find((f) => f.id === initialFamilyId) ?? null;
+  const [selectedFamily, setSelectedFamily] = useState<Family | null>(null);
+
+  // Read ?family= from URL on mount (for shareable links)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const familyId = params.get("family");
+    if (familyId) {
+      const family = initialFamilies.find((f) => f.id === Number(familyId));
+      if (family) setSelectedFamily(family);
     }
-    return null;
-  });
+  }, [initialFamilies]);
 
   const filtered = useMemo(() => {
     let results = [...initialFamilies];
