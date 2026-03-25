@@ -15,6 +15,13 @@ export function getDb(): Database.Database {
   return _db;
 }
 
+export function closeDb() {
+  if (_db) {
+    _db.close();
+    _db = null;
+  }
+}
+
 function initSchema(db: Database.Database) {
   db.exec(`
     CREATE TABLE IF NOT EXISTS families (
