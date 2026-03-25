@@ -6,12 +6,29 @@ export const metadata: Metadata = {
   title: "Storm Kokua - Kona Low Storm Relief for Hawai'i",
   description:
     "Support families, farms, and businesses affected by the Kona Low storms across Hawai'i. Find and donate to those who need it most.",
+  metadataBase: new URL("https://stormkokua.com"),
   openGraph: {
     title: "Storm Kokua - Kona Low Storm Relief",
     description:
-      "81 families across Hawai'i need your help after the Kona Low storms. Browse and donate.",
+      "Families across Hawai'i need your help after the Kona Low storms. Browse and donate to those who need it most.",
     type: "website",
     url: "https://stormkokua.com",
+    siteName: "Storm Kokua",
+    images: [
+      {
+        url: "/og-image",
+        width: 1200,
+        height: 630,
+        alt: "Storm Kokua - Kona Low Storm Relief for Hawai'i",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Storm Kokua - Kona Low Storm Relief",
+    description:
+      "Families across Hawai'i need your help after the Kona Low storms. Browse and donate.",
+    images: ["/og-image"],
   },
 };
 

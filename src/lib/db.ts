@@ -145,6 +145,14 @@ function mapFamilyRow(row: FamilyRow): Family {
   };
 }
 
+export function getFamilyById(id: number): Family | null {
+  const db = getDb();
+  const row = db
+    .prepare("SELECT * FROM families WHERE id = ?")
+    .get(id) as FamilyRow | undefined;
+  return row ? mapFamilyRow(row) : null;
+}
+
 export function getAllFamilies(): Family[] {
   const db = getDb();
   return (db.prepare("SELECT * FROM families ORDER BY name").all() as FamilyRow[]).map(

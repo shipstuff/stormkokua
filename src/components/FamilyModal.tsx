@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import type { Family } from "@/lib/db";
-import { STORMKOKUA_SHEET_URL } from "@/lib/links";
 
 function formatCurrency(amount: number) {
   return new Intl.NumberFormat("en-US", {
@@ -12,19 +11,14 @@ function formatCurrency(amount: number) {
   }).format(amount);
 }
 
-function formatHandle(family: Family) {
-  if (!family.donation_handle) return null;
-
-  if (family.donation_platform === "CashApp") {
-    return `$${family.donation_handle}`;
-  }
-
-  if (family.donation_platform === "Venmo") {
-    return `@${family.donation_handle}`;
-  }
-
-  return family.donation_handle;
-}
+const platformBtnStyles: Record<string, string> = {
+  GoFundMe: "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20",
+  Venmo: "bg-blue-600 hover:bg-blue-700 shadow-blue-600/20",
+  CashApp: "bg-green-600 hover:bg-green-700 shadow-green-600/20",
+  SpotFund: "bg-purple-600 hover:bg-purple-700 shadow-purple-600/20",
+  Website: "bg-amber-600 hover:bg-amber-700 shadow-amber-600/20",
+  Other: "bg-slate-600 hover:bg-slate-700 shadow-slate-600/20",
+};
 
 export function FamilyModal({
   family,
@@ -33,7 +27,7 @@ export function FamilyModal({
   family: Family | null;
   onClose: () => void;
 }) {
-  const [copied, setCopied] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
 
   useEffect(() => {
     if (!family) return;
@@ -56,15 +50,21 @@ export function FamilyModal({
   }, [family, onClose]);
 
   useEffect(() => {
-    if (!copied) return;
+    if (!shareCopied) return;
 
-    const timeout = window.setTimeout(() => setCopied(false), 1500);
+    const timeout = window.setTimeout(() => setShareCopied(false), 2000);
     return () => window.clearTimeout(timeout);
-  }, [copied]);
+  }, [shareCopied]);
 
   if (!family) return null;
 
-  const handle = formatHandle(family);
+  const handle = family.donation_handle
+    ? family.donation_platform === "CashApp"
+      ? `$${family.donation_handle}`
+      : family.donation_platform === "Venmo"
+        ? `@${family.donation_handle}`
+        : family.donation_handle
+    : null;
 
   return (
     <div
@@ -134,35 +134,32 @@ export function FamilyModal({
                 href={family.donation_link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-ocean-950 px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-ocean-900 sm:w-auto sm:rounded-full sm:py-3"
+                className={`inline-flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3.5 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg sm:w-auto sm:rounded-full sm:py-3 ${platformBtnStyles[family.donation_platform || "Other"] || platformBtnStyles.Other}`}
               >
-                Open Donation Link
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                </svg>
+                Donate Now
               </a>
             )}
-            <a
-              href={STORMKOKUA_SHEET_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 px-5 py-3.5 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 sm:w-auto sm:rounded-full sm:py-3"
+            <button
+              type="button"
+              onClick={async () => {
+                const shareUrl = `${window.location.origin}/family/${family.id}`;
+                try {
+                  await navigator.clipboard.writeText(shareUrl);
+                  setShareCopied(true);
+                } catch {
+                  /* clipboard failed */
+                }
+              }}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-ocean-200 bg-ocean-50 px-5 py-3.5 text-sm font-semibold text-ocean-700 transition hover:border-ocean-300 hover:bg-ocean-100 sm:w-auto sm:rounded-full sm:py-3"
             >
-              Open Source Sheet
-            </a>
-            {handle && (
-              <button
-                type="button"
-                onClick={async () => {
-                  try {
-                    await navigator.clipboard.writeText(handle);
-                    setCopied(true);
-                  } catch {
-                    setCopied(false);
-                  }
-                }}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 px-5 py-3.5 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 sm:w-auto sm:rounded-full sm:py-3"
-              >
-                {copied ? "Copied" : `Copy ${handle}`}
-              </button>
-            )}
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
+              </svg>
+              {shareCopied ? "Link Copied!" : "Share"}
+            </button>
           </div>
 
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
