@@ -1,14 +1,10 @@
-import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { getFamilyById } from "@/lib/db";
+import { formatCompactCurrency } from "@/lib/format";
+import { FamilyRedirect } from "./redirect";
 
 export const dynamic = "force-dynamic";
-
-function formatCurrency(amount: number): string {
-  if (amount >= 1_000_000) return `$${(amount / 1_000_000).toFixed(2)}M`;
-  if (amount >= 1_000) return `$${(amount / 1_000).toFixed(0)}K`;
-  return `$${amount.toLocaleString("en-US")}`;
-}
 
 export async function generateMetadata({
   params,
@@ -21,7 +17,7 @@ export async function generateMetadata({
 
   const raisedText =
     family.amount_raised !== null
-      ? ` - Raised ${formatCurrency(family.amount_raised)}`
+      ? ` - Raised ${formatCompactCurrency(family.amount_raised)}`
       : "";
 
   const title = `Help ${family.name}${raisedText} | Storm Kokua`;
@@ -65,5 +61,5 @@ export default async function FamilyPage({
   const family = getFamilyById(Number(id));
   if (!family) notFound();
 
-  redirect(`/?family=${id}`);
+  return <FamilyRedirect id={id} />;
 }

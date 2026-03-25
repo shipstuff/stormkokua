@@ -5,6 +5,7 @@ import {
   STORMKOKUA_OVERALL_FUND_URL,
   STORMKOKUA_SHEET_URL,
 } from "@/lib/links";
+import { formatCompactCurrency } from "@/lib/format";
 
 interface Stats {
   totalFamilies: number;
@@ -14,16 +15,6 @@ interface Stats {
   trackedFamilies: number;
   islands: { island: string; count: number }[];
   lastSync: string | null;
-}
-
-function formatCompactCurrency(amount: number): string {
-  if (amount >= 1_000_000) {
-    return `$${(amount / 1_000_000).toFixed(2)}M`;
-  }
-  if (amount >= 1_000) {
-    return `$${(amount / 1_000).toFixed(0)}K`;
-  }
-  return `$${amount.toLocaleString("en-US")}`;
 }
 
 export function MetricsBanner({ stats }: { stats: Stats }) {

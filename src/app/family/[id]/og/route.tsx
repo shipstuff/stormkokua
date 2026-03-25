@@ -1,14 +1,9 @@
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 import { getFamilyById } from "@/lib/db";
+import { formatCompactCurrency } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
-
-function formatCurrency(amount: number): string {
-  if (amount >= 1_000_000) return `$${(amount / 1_000_000).toFixed(2)}M`;
-  if (amount >= 1_000) return `$${(amount / 1_000).toFixed(0)}K`;
-  return `$${amount.toLocaleString("en-US")}`;
-}
 
 export async function GET(
   _request: NextRequest,
@@ -86,7 +81,7 @@ export async function GET(
             background:
               family.amount_raised !== null
                 ? "rgba(249, 115, 22, 0.2)"
-                : "rgba(249, 115, 22, 0.2)",
+                : "rgba(255, 255, 255, 0.05)",
             border: "1px solid rgba(251, 146, 60, 0.3)",
             borderRadius: "16px",
             padding: "20px 48px",
@@ -102,7 +97,7 @@ export async function GET(
             }}
           >
             {family.amount_raised !== null
-              ? formatCurrency(family.amount_raised)
+              ? formatCompactCurrency(family.amount_raised)
               : "Donate Now"}
           </div>
           {family.amount_raised !== null && (

@@ -1,15 +1,13 @@
 import { ImageResponse } from "next/og";
 import { getStats } from "@/lib/db";
+import { formatCompactCurrency } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   const stats = getStats();
 
-  const formattedRaised =
-    stats.totalRaised >= 1_000_000
-      ? `$${(stats.totalRaised / 1_000_000).toFixed(2)}M`
-      : `$${(stats.totalRaised / 1_000).toFixed(0)}K`;
+  const formattedRaised = formatCompactCurrency(stats.totalRaised);
 
   return new ImageResponse(
     (

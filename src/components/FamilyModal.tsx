@@ -11,20 +11,6 @@ function formatCurrency(amount: number) {
   }).format(amount);
 }
 
-function formatHandle(family: Family) {
-  if (!family.donation_handle) return null;
-
-  if (family.donation_platform === "CashApp") {
-    return `$${family.donation_handle}`;
-  }
-
-  if (family.donation_platform === "Venmo") {
-    return `@${family.donation_handle}`;
-  }
-
-  return family.donation_handle;
-}
-
 const platformBtnStyles: Record<string, string> = {
   GoFundMe: "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20",
   Venmo: "bg-blue-600 hover:bg-blue-700 shadow-blue-600/20",
@@ -72,7 +58,13 @@ export function FamilyModal({
 
   if (!family) return null;
 
-  const handle = formatHandle(family);
+  const handle = family.donation_handle
+    ? family.donation_platform === "CashApp"
+      ? `$${family.donation_handle}`
+      : family.donation_platform === "Venmo"
+        ? `@${family.donation_handle}`
+        : family.donation_handle
+    : null;
 
   return (
     <div
