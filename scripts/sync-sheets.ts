@@ -506,7 +506,7 @@ async function fetchOverallFundAmount(): Promise<number> {
   return parseOverallFundAmount(await response.text());
 }
 
-async function syncSheet() {
+export async function syncSheet() {
   console.log("Fetching Google Sheet data...");
 
   const overallFundAmountPromise = fetchOverallFundAmount().catch((error) => {
@@ -574,11 +574,14 @@ async function syncSheet() {
   );
 }
 
-mkdirSync(join(process.cwd(), "data"), { recursive: true });
-getDb();
+// Run directly when invoked as a script (npm run db:sync)
+if (process.argv[1]?.endsWith("sync-sheets.ts")) {
+  mkdirSync(join(process.cwd(), "data"), { recursive: true });
+  getDb();
 
-syncSheet().catch((error) => {
-  console.error("Sync failed:", error);
-  logSync(0, `error: ${error instanceof Error ? error.message : "unknown error"}`);
-  process.exit(1);
-});
+  syncSheet().catch((error) => {
+    console.error("Sync failed:", error);
+    logSync(0, `error: ${error instanceof Error ? error.message : "unknown error"}`);
+    process.exit(1);
+  });
+}
