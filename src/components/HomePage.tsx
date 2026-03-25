@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import type { Family } from "@/lib/db";
 import { MetricsBanner } from "./MetricsBanner";
 import { FilterBar } from "./FilterBar";
@@ -32,6 +32,20 @@ export function HomePage({
   >("default");
   const [selectedFamily, setSelectedFamily] = useState<Family | null>(null);
 
+  const openFamily = useCallback((family: Family) => {
+    setSelectedFamily(family);
+    const url = new URL(window.location.href);
+    url.searchParams.set("family", String(family.id));
+    window.history.pushState({}, "", url.toString());
+  }, []);
+
+  const closeFamily = useCallback(() => {
+    setSelectedFamily(null);
+    const url = new URL(window.location.href);
+    url.searchParams.delete("family");
+    window.history.pushState({}, "", url.pathname + url.search);
+  }, []);
+
   // Read ?family= from URL on mount (for shareable links)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -40,6 +54,22 @@ export function HomePage({
       const family = initialFamilies.find((f) => f.id === Number(familyId));
       if (family) setSelectedFamily(family);
     }
+  }, [initialFamilies]);
+
+  // Handle browser back/forward
+  useEffect(() => {
+    const onPopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      const familyId = params.get("family");
+      if (familyId) {
+        const family = initialFamilies.find((f) => f.id === Number(familyId));
+        setSelectedFamily(family || null);
+      } else {
+        setSelectedFamily(null);
+      }
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
   }, [initialFamilies]);
 
   const filtered = useMemo(() => {
@@ -106,7 +136,7 @@ export function HomePage({
             <FamilyCard
               key={family.id}
               family={family}
-              onSelect={setSelectedFamily}
+              onSelect={openFamily}
             />
           ))}
         </div>
@@ -155,7 +185,7 @@ export function HomePage({
 
       <FamilyModal
         family={selectedFamily}
-        onClose={() => setSelectedFamily(null)}
+        onClose={closeFamily}
       />
     </main>
   );
