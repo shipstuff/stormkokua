@@ -11,10 +11,10 @@ export async function register() {
 
     let shuttingDown = false;
 
-    function shutdown(signal: string) {
+    function shutdown(signal: string, code = 0) {
       if (shuttingDown) return;
       shuttingDown = true;
-      log.info("shutdown", { signal });
+      log.info("shutdown", { signal, code });
       try {
         closeDb();
       } catch (err) {
@@ -22,7 +22,7 @@ export async function register() {
           error: err instanceof Error ? err.message : String(err),
         });
       }
-      process.exit(0);
+      process.exit(code);
     }
 
     process.on("SIGTERM", () => shutdown("SIGTERM"));
@@ -33,7 +33,7 @@ export async function register() {
         error: err.message,
         stack: err.stack,
       });
-      shutdown("uncaughtException");
+      shutdown("uncaughtException", 1);
     });
 
     process.on("unhandledRejection", (reason) => {
