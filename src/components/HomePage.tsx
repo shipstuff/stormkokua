@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import type { Family } from "@/lib/db";
+import { SITE_TITLE } from "@/lib/constants";
 import { MetricsBanner } from "./MetricsBanner";
 import { FilterBar } from "./FilterBar";
 import { FamilyCard } from "./FamilyCard";
@@ -32,21 +33,26 @@ export function HomePage({
   >("default");
   const [selectedFamily, setSelectedFamily] = useState<Family | null>(null);
 
-  const [defaultTitle] = useState(() =>
-    typeof document !== "undefined" ? document.title : ""
-  );
+  const setMeta = useCallback((tag: string, content: string) => {
+    document.querySelector(`meta[property="${tag}"]`)?.setAttribute("content", content);
+  }, []);
 
   const openFamily = useCallback((family: Family) => {
     setSelectedFamily(family);
-    document.title = `Help ${family.name} | Storm Kokua`;
+    const title = `Help ${family.name} | Storm Kokua`;
+    document.title = title;
+    setMeta("og:title", title);
+    setMeta("og:url", `https://stormkokua.com/family/${family.id}`);
     window.history.pushState({}, "", `/family/${family.id}`);
-  }, []);
+  }, [setMeta]);
 
   const closeFamily = useCallback(() => {
     setSelectedFamily(null);
-    document.title = defaultTitle;
+    document.title = SITE_TITLE;
+    setMeta("og:title", SITE_TITLE);
+    setMeta("og:url", "https://stormkokua.com");
     window.history.pushState({}, "", "/");
-  }, [defaultTitle]);
+  }, [setMeta]);
 
   // Read family ID from URL on mount (supports /family/123 and ?family=123)
   useEffect(() => {

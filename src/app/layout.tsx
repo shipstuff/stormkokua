@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
+import { SITE_TITLE } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: "Storm Kokua - Kona Low Storm Relief for Hawai'i",
+  title: SITE_TITLE,
   description:
     "Support families, farms, and businesses affected by the Kona Low storms across Hawai'i. Find and donate to those who need it most.",
   metadataBase: new URL("https://stormkokua.com"),
