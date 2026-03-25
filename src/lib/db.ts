@@ -233,15 +233,19 @@ export function replaceFamilies(families: FamilyInput[]) {
        description = excluded.description,
        island = excluded.island,
        neighborhood = excluded.neighborhood,
-       amount_raised = excluded.amount_raised,
+       amount_raised = COALESCE(excluded.amount_raised, families.amount_raised),
        donation_handle = excluded.donation_handle,
        related_links = excluded.related_links,
        updated_at = datetime('now')`
   );
 
   const replace = db.transaction((rows: FamilyInput[]) => {
-    db.prepare("DELETE FROM families").run();
+    // Build set of (name, area) keys for cleanup
+    const keys = new Set(
+      rows.map((f) => `${f.name}\0${f.area ?? ""}`)
+    );
 
+    // Upsert all current families, preserving amount_raised when new value is null
     for (const family of rows) {
       upsert.run(
         family.name,
@@ -255,6 +259,19 @@ export function replaceFamilies(families: FamilyInput[]) {
         family.donation_handle,
         JSON.stringify(family.related_links)
       );
+    }
+
+    // Remove families no longer in the sheet
+    const existing = db
+      .prepare("SELECT name, area FROM families")
+      .all() as { name: string; area: string | null }[];
+    const del = db.prepare(
+      "DELETE FROM families WHERE name = ? AND (area = ? OR (area IS NULL AND ? IS NULL))"
+    );
+    for (const row of existing) {
+      if (!keys.has(`${row.name}\0${row.area ?? ""}`)) {
+        del.run(row.name, row.area, row.area);
+      }
     }
   });
 
