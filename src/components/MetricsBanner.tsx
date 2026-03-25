@@ -16,17 +16,19 @@ interface Stats {
   lastSync: string | null;
 }
 
+function formatCompactCurrency(amount: number): string {
+  if (amount >= 1_000_000) {
+    return `$${(amount / 1_000_000).toFixed(2)}M`;
+  }
+  if (amount >= 1_000) {
+    return `$${(amount / 1_000).toFixed(0)}K`;
+  }
+  return `$${amount.toLocaleString("en-US")}`;
+}
+
 export function MetricsBanner({ stats }: { stats: Stats }) {
-  const formattedRaised = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(stats.totalRaised);
-  const formattedOverallFundRaised = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(stats.overallFundRaised);
+  const formattedRaised = formatCompactCurrency(stats.totalRaised);
+  const formattedOverallFundRaised = formatCompactCurrency(stats.overallFundRaised);
 
   return (
     <section className="relative overflow-hidden bg-ocean-950 text-white">
@@ -90,17 +92,10 @@ export function MetricsBanner({ stats }: { stats: Stats }) {
         </div>
 
         {/* Stats row */}
-        <div className="mx-auto grid max-w-5xl grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 sm:gap-5">
+        <div className="mx-auto grid max-w-3xl grid-cols-3 gap-3 sm:gap-5">
           <StatCard value={stats.totalFamilies} label="Families in need" accent />
           <StatCard value={formattedRaised} label="Estimated raised" />
           <StatCard value={stats.islands.length} label="Islands affected" />
-          {stats.islands.slice(0, 2).map((island) => (
-            <StatCard
-              key={island.island}
-              value={island.count}
-              label={island.island}
-            />
-          ))}
         </div>
         <p className="mx-auto mt-4 max-w-3xl text-center text-xs leading-6 text-ocean-300">
           {stats.overallFundRaised > 0

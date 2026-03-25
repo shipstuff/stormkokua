@@ -21,16 +21,23 @@ interface Stats {
 export function HomePage({
   initialFamilies,
   initialStats,
+  initialFamilyId,
 }: {
   initialFamilies: Family[];
   initialStats: Stats;
+  initialFamilyId?: number;
 }) {
   const [selectedIsland, setSelectedIsland] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<
     "default" | "amount-asc" | "amount-desc"
   >("default");
-  const [selectedFamily, setSelectedFamily] = useState<Family | null>(null);
+  const [selectedFamily, setSelectedFamily] = useState<Family | null>(() => {
+    if (initialFamilyId) {
+      return initialFamilies.find((f) => f.id === initialFamilyId) ?? null;
+    }
+    return null;
+  });
 
   const filtered = useMemo(() => {
     let results = [...initialFamilies];
@@ -129,6 +136,17 @@ export function HomePage({
               })}
             </p>
           )}
+          <p className="mt-3 text-xs text-slate-400">
+            Developed with aloha by{" "}
+            <a
+              href="https://shipstuff.fun"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-ocean-600 hover:text-ocean-700 transition-colors"
+            >
+              shipstuff.fun
+            </a>
+          </p>
         </div>
       </footer>
 
