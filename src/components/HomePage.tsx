@@ -34,22 +34,18 @@ export function HomePage({
 
   const openFamily = useCallback((family: Family) => {
     setSelectedFamily(family);
-    const url = new URL(window.location.href);
-    url.searchParams.set("family", String(family.id));
-    window.history.pushState({}, "", url.toString());
+    window.history.pushState({}, "", `/family/${family.id}`);
   }, []);
 
   const closeFamily = useCallback(() => {
     setSelectedFamily(null);
-    const url = new URL(window.location.href);
-    url.searchParams.delete("family");
-    window.history.pushState({}, "", url.pathname + url.search);
+    window.history.pushState({}, "", "/");
   }, []);
 
-  // Read ?family= from URL on mount (for shareable links)
+  // Read family ID from URL on mount (supports /family/123 and ?family=123)
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const familyId = params.get("family");
+    const pathMatch = window.location.pathname.match(/^\/family\/(\d+)/);
+    const familyId = pathMatch ? pathMatch[1] : new URLSearchParams(window.location.search).get("family");
     if (familyId) {
       const family = initialFamilies.find((f) => f.id === Number(familyId));
       if (family) setSelectedFamily(family);
@@ -59,8 +55,8 @@ export function HomePage({
   // Handle browser back/forward
   useEffect(() => {
     const onPopState = () => {
-      const params = new URLSearchParams(window.location.search);
-      const familyId = params.get("family");
+      const pathMatch = window.location.pathname.match(/^\/family\/(\d+)/);
+      const familyId = pathMatch ? pathMatch[1] : new URLSearchParams(window.location.search).get("family");
       if (familyId) {
         const family = initialFamilies.find((f) => f.id === Number(familyId));
         setSelectedFamily(family || null);
