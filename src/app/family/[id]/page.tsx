@@ -28,15 +28,21 @@ export async function generateMetadata({
     ? family.description.slice(0, 200)
     : `Support ${family.name} from ${family.island || "Hawai'i"} after the Kona Low storms.`;
 
+  const stats = getStats();
+  const modifiedTime = stats.lastSync
+    ? new Date(stats.lastSync + "Z").toISOString()
+    : new Date().toISOString();
+
   return {
     title,
     description,
     openGraph: {
       title,
       description,
-      type: "website",
+      type: "article",
       url: `https://stormkokua.com/family/${id}`,
       siteName: "Storm Kokua",
+      modifiedTime,
       images: [
         {
           url: `/family/${id}/og.png`,
