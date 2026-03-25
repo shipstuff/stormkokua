@@ -48,13 +48,7 @@ export function HomePage({
     const familyId = pathMatch ? pathMatch[1] : new URLSearchParams(window.location.search).get("family");
     if (familyId) {
       const family = initialFamilies.find((f) => f.id === Number(familyId));
-      if (family) {
-        setSelectedFamily(family);
-        // Converge ?family= URLs to clean /family/{id} path for sharing
-        if (!pathMatch) {
-          window.history.replaceState({}, "", `/family/${family.id}`);
-        }
-      }
+      if (family) setSelectedFamily(family);
     }
   }, [initialFamilies]);
 

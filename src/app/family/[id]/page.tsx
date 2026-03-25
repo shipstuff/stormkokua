@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getAllFamilies, getFamilyById } from "@/lib/db";
+import { getAllFamilies, getFamilyById, getStats } from "@/lib/db";
 import { formatCompactCurrency } from "@/lib/format";
-import { FamilyRedirect } from "./redirect";
+import { HomePage } from "@/components/HomePage";
 
 export async function generateStaticParams() {
   const families = getAllFamilies();
@@ -64,5 +64,8 @@ export default async function FamilyPage({
   const family = getFamilyById(Number(id));
   if (!family) notFound();
 
-  return <FamilyRedirect id={id} />;
+  const families = getAllFamilies();
+  const stats = getStats();
+
+  return <HomePage initialFamilies={families} initialStats={stats} />;
 }
