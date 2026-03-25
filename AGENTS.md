@@ -26,12 +26,12 @@ npm run dev                       # http://localhost:3000
 ## Production Build (Standalone)
 
 ```bash
-npm run prod                      # sync sheets + build standalone
+npm run build:prod                      # sync sheets + build standalone
 npm run start                     # start standalone server
 npm run db:sync                   # resync sheets data without rebuilding
 ```
 
-The standalone build (`output: "standalone"` in next.config.ts) bundles only the required node_modules (~73MB vs ~644MB full). The VPS deploy loop runs `npm run prod` then `npm run start`.
+The standalone build (`output: "standalone"` in next.config.ts) bundles only the required node_modules (~73MB vs ~644MB full). The VPS deploy loop runs `npm run build:prod` then `npm run start`.
 
 ## Key Routes
 
