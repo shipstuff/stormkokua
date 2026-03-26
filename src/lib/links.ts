@@ -6,3 +6,8 @@ export const STORMKOKUA_FORM_URL =
 
 export const STORMKOKUA_OVERALL_FUND_URL =
   "https://www.gofundme.com/f/2026-flood-relief-fund";
+
+export const HELP_MAUI_RISE_URL = "https://helpmauirise.org";
+
+export const HELP_MAUI_RISE_INSTAGRAM_URL =
+  "https://instagram.com/helpmauirise";

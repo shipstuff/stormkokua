@@ -1,6 +1,8 @@
 "use client";
 
 import {
+  HELP_MAUI_RISE_INSTAGRAM_URL,
+  HELP_MAUI_RISE_URL,
   STORMKOKUA_FORM_URL,
   STORMKOKUA_OVERALL_FUND_URL,
   STORMKOKUA_SHEET_URL,
@@ -45,12 +47,48 @@ export function MetricsBanner({ stats }: { stats: Stats }) {
             Kona Low Storm Relief
           </p>
           <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
-            Storm K<span className="text-[#f4d67f]">o</span>kua
+            Storm K<span className="text-[#f4d67f]">ō</span>kua
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-white/[0.88]">
-            Families, farms, and businesses across Hawai&#699;i were devastated by
-            the Kona Low storms. They need our help.
+            Storm Kōkua is a statewide Help Maui Rise initiative using the same
+            direct-to-ʻohana model developed after Lahaina to bring quick,
+            direct aid to families impacted by the Kona Low Storm.
           </p>
+          <div className="mx-auto mt-4 max-w-2xl text-sm text-white/[0.72]">
+            <p>
+              Learn more about Help Maui Rise:
+            </p>
+            <div className="mt-3 flex items-center justify-center gap-3">
+              <a
+                href={HELP_MAUI_RISE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Help Maui Rise website"
+                title="Help Maui Rise website"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/14 bg-white/[0.08] text-[#f4d67f] transition hover:bg-white/[0.14] hover:text-white"
+              >
+                <svg className="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M3 12h18" />
+                  <path d="M12 3c2.5 2.4 4 5.6 4 9s-1.5 6.6-4 9c-2.5-2.4-4-5.6-4-9s1.5-6.6 4-9z" />
+                </svg>
+              </a>
+              <a
+                href={HELP_MAUI_RISE_INSTAGRAM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Help Maui Rise Instagram"
+                title="Instagram @helpmauirise"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/14 bg-white/[0.08] text-white/[0.82] transition hover:bg-white/[0.14] hover:text-white"
+              >
+                <svg className="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <rect x="3.5" y="3.5" width="17" height="17" rx="4.5" />
+                  <circle cx="12" cy="12" r="4" />
+                  <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+                </svg>
+              </a>
+            </div>
+          </div>
           <div className="mx-auto mt-5 grid max-w-sm gap-3 sm:flex sm:max-w-none sm:flex-wrap sm:items-center sm:justify-center">
             <a
               href={STORMKOKUA_SHEET_URL}
