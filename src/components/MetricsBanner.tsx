@@ -40,8 +40,8 @@ export function MetricsBanner({ stats }: { stats: Stats }) {
       </div>
 
       <div className="relative mx-auto max-w-6xl px-4 pt-12 pb-10 sm:px-6 lg:px-8">
-        <div className="text-center mb-10">
-          <p className="mb-3 text-sm font-semibold tracking-[0.3em] text-[#e8d9a7] uppercase">
+        <div className="mb-10 text-center">
+          <p className="mb-3 text-xs font-semibold tracking-[0.22em] text-[#e8d9a7] uppercase sm:text-sm sm:tracking-[0.3em]">
             Kona Low Storm Relief
           </p>
           <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
@@ -51,12 +51,12 @@ export function MetricsBanner({ stats }: { stats: Stats }) {
             Families, farms, and businesses across Hawai&#699;i were devastated by
             the Kona Low storms. They need our help.
           </p>
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+          <div className="mx-auto mt-5 grid max-w-sm gap-3 sm:flex sm:max-w-none sm:flex-wrap sm:items-center sm:justify-center">
             <a
               href={STORMKOKUA_SHEET_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.12] px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/[0.18]"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/20 bg-white/[0.12] px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/[0.18] sm:w-auto"
             >
               Open Original Spreadsheet
             </a>
@@ -64,7 +64,7 @@ export function MetricsBanner({ stats }: { stats: Stats }) {
               href={STORMKOKUA_FORM_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-[#f4d67f]/35 bg-[#c56a2d]/35 px-4 py-2 text-sm font-semibold text-[#fff4d6] backdrop-blur-sm transition hover:bg-[#c56a2d]/45"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#f4d67f]/35 bg-[#c56a2d]/35 px-4 py-2 text-sm font-semibold text-[#fff4d6] backdrop-blur-sm transition hover:bg-[#c56a2d]/45 sm:w-auto"
             >
               Submit Family Information
             </a>
@@ -72,12 +72,12 @@ export function MetricsBanner({ stats }: { stats: Stats }) {
               href={STORMKOKUA_OVERALL_FUND_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full bg-[#c56a2d] px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-[#1c140c]/30 transition hover:bg-[#af5d28]"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#c56a2d] px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-[#1c140c]/30 transition hover:bg-[#af5d28] sm:w-auto"
             >
               Donate To Overall Fund
             </a>
             {stats.lastSync && (
-              <span className="rounded-full border border-white/15 bg-black/20 px-4 py-2 text-sm text-white/[0.75] backdrop-blur-sm">
+              <span className="inline-flex w-full items-center justify-center rounded-full border border-white/15 bg-black/20 px-4 py-2 text-sm text-white/[0.75] backdrop-blur-sm sm:w-auto">
                 Last synced{" "}
                 {new Date(stats.lastSync + "Z").toLocaleDateString("en-US", {
                   month: "short",
