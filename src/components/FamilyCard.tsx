@@ -70,12 +70,12 @@ export function FamilyCard({
 
   return (
     <article
-      className="group relative flex h-full cursor-pointer flex-col rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-lg"
+      className="group relative flex h-full min-w-0 cursor-pointer flex-col rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-lg"
       onClick={() => onSelect(family)}
     >
       {/* Header */}
       <div className="flex items-start justify-between gap-3 mb-3">
-        <h3 className="font-bold text-base leading-snug text-slate-900 group-hover:text-ocean-700 transition-colors">
+        <h3 className="min-w-0 flex-1 font-bold text-base leading-snug text-slate-900 transition-colors group-hover:text-ocean-700">
           {family.name}
         </h3>
         {family.donation_platform && (
