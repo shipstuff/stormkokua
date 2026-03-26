@@ -90,7 +90,7 @@ export function MetricsBanner({ stats }: { stats: Stats }) {
           </div>
         </div>
 
-        <div className="mx-auto grid max-w-3xl grid-cols-3 gap-3 sm:gap-5">
+        <div className="mx-auto grid max-w-3xl grid-cols-3 gap-2 sm:gap-5">
           <StatCard value={stats.totalFamilies} label="Families in need" accent />
           <StatCard value={formattedRaised} label="Estimated raised" />
           <StatCard value={stats.islands.length} label="Islands affected" />
@@ -129,15 +129,15 @@ function StatCard({
   accent?: boolean;
 }) {
   return (
-    <div className={`rounded-2xl px-4 py-4 text-center ${
+    <div className={`min-w-0 rounded-2xl px-3 py-4 text-center sm:px-4 ${
       accent
         ? "bg-[#c56a2d]/28 ring-1 ring-[#f4d67f]/30 backdrop-blur-sm"
         : "bg-white/10 ring-1 ring-white/14 backdrop-blur-sm"
     }`}>
-      <p className={`text-3xl font-extrabold tabular-nums ${accent ? "text-[#f4d67f]" : "text-white"}`}>
+      <p className={`text-2xl leading-none font-extrabold tabular-nums sm:text-3xl ${accent ? "text-[#f4d67f]" : "text-white"}`}>
         {value}
       </p>
-      <p className="mt-1 text-xs font-medium uppercase tracking-wide text-white/[0.68]">
+      <p className="mt-1 text-[11px] font-medium uppercase tracking-wide text-white/[0.68] sm:text-xs">
         {label}
       </p>
     </div>
