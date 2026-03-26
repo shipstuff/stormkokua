@@ -22,24 +22,32 @@ export function MetricsBanner({ stats }: { stats: Stats }) {
   const formattedOverallFundRaised = formatCompactCurrency(stats.overallFundRaised);
 
   return (
-    <section className="relative overflow-hidden bg-ocean-950 text-white">
-      {/* Subtle wave overlay */}
-      <div className="absolute inset-0 opacity-[0.07]">
+    <section className="relative overflow-hidden bg-[#24362d] text-white">
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{
+          backgroundImage:
+            "linear-gradient(180deg, rgba(24, 37, 28, 0.48) 0%, rgba(18, 31, 24, 0.7) 50%, rgba(12, 24, 19, 0.88) 100%), url('/hero.jpg')",
+        }}
+      />
+
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,244,204,0.24),_transparent_42%)]" />
+
+      <div className="absolute inset-0 opacity-[0.08]">
         <svg className="h-full w-full" preserveAspectRatio="none" viewBox="0 0 1440 560">
           <path d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,261.3C960,256,1056,224,1152,208C1248,192,1344,192,1392,192L1440,192L1440,560L0,560Z" fill="currentColor" />
         </svg>
       </div>
 
       <div className="relative mx-auto max-w-6xl px-4 pt-12 pb-10 sm:px-6 lg:px-8">
-        {/* Hero */}
         <div className="text-center mb-10">
-          <p className="text-ocean-300 text-sm font-semibold tracking-widest uppercase mb-3">
+          <p className="mb-3 text-sm font-semibold tracking-[0.3em] text-[#e8d9a7] uppercase">
             Kona Low Storm Relief
           </p>
           <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
-            Storm K<span className="text-ocean-400">o</span>kua
+            Storm K<span className="text-[#f4d67f]">o</span>kua
           </h1>
-          <p className="mt-4 text-lg text-ocean-200 max-w-2xl mx-auto leading-relaxed">
+          <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-white/[0.88]">
             Families, farms, and businesses across Hawai&#699;i were devastated by
             the Kona Low storms. They need our help.
           </p>
@@ -48,7 +56,7 @@ export function MetricsBanner({ stats }: { stats: Stats }) {
               href={STORMKOKUA_SHEET_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/15"
+              className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.12] px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/[0.18]"
             >
               Open Original Spreadsheet
             </a>
@@ -56,7 +64,7 @@ export function MetricsBanner({ stats }: { stats: Stats }) {
               href={STORMKOKUA_FORM_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-lava-300/30 bg-lava-500/20 px-4 py-2 text-sm font-semibold text-lava-50 transition hover:bg-lava-500/30"
+              className="inline-flex items-center gap-2 rounded-full border border-[#f4d67f]/35 bg-[#c56a2d]/35 px-4 py-2 text-sm font-semibold text-[#fff4d6] backdrop-blur-sm transition hover:bg-[#c56a2d]/45"
             >
               Submit Family Information
             </a>
@@ -64,12 +72,12 @@ export function MetricsBanner({ stats }: { stats: Stats }) {
               href={STORMKOKUA_OVERALL_FUND_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full bg-lava-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-lava-950/20 transition hover:bg-lava-600"
+              className="inline-flex items-center gap-2 rounded-full bg-[#c56a2d] px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-[#1c140c]/30 transition hover:bg-[#af5d28]"
             >
               Donate To Overall Fund
             </a>
             {stats.lastSync && (
-              <span className="rounded-full border border-white/10 bg-ocean-900/60 px-4 py-2 text-sm text-ocean-200">
+              <span className="rounded-full border border-white/15 bg-black/20 px-4 py-2 text-sm text-white/[0.75] backdrop-blur-sm">
                 Last synced{" "}
                 {new Date(stats.lastSync + "Z").toLocaleDateString("en-US", {
                   month: "short",
@@ -82,13 +90,12 @@ export function MetricsBanner({ stats }: { stats: Stats }) {
           </div>
         </div>
 
-        {/* Stats row */}
         <div className="mx-auto grid max-w-3xl grid-cols-3 gap-3 sm:gap-5">
           <StatCard value={stats.totalFamilies} label="Families in need" accent />
           <StatCard value={formattedRaised} label="Estimated raised" />
           <StatCard value={stats.islands.length} label="Islands affected" />
         </div>
-        <p className="mx-auto mt-4 max-w-3xl text-center text-xs leading-6 text-ocean-300">
+        <p className="mx-auto mt-4 max-w-3xl text-center text-xs leading-6 text-white/[0.72]">
           {stats.overallFundRaised > 0
             ? `Estimated raised includes ${formattedOverallFundRaised} from the overall GoFundMe relief fund, plus ${stats.trackedFamilies} public family GoFundMe totals from the source sheet.`
             : `Estimated raised is based on ${stats.trackedFamilies} public family GoFundMe totals from the source sheet.`}{" "}
@@ -96,11 +103,10 @@ export function MetricsBanner({ stats }: { stats: Stats }) {
           public.
         </p>
 
-        {/* CTA */}
         <div className="mt-8 text-center">
           <a
             href="#families"
-            className="inline-flex items-center gap-2 rounded-full bg-lava-500 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-lava-500/25 hover:bg-lava-600 transition-all hover:shadow-lava-500/40 hover:-translate-y-0.5"
+            className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-bold text-[#1d2d24] shadow-lg shadow-black/20 transition-all hover:-translate-y-0.5 hover:bg-[#f6f0de] hover:shadow-black/30"
           >
             Browse &amp; Donate
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
@@ -125,13 +131,13 @@ function StatCard({
   return (
     <div className={`rounded-2xl px-4 py-4 text-center ${
       accent
-        ? "bg-lava-500/20 ring-1 ring-lava-400/30"
-        : "bg-white/5 ring-1 ring-white/10"
+        ? "bg-[#c56a2d]/28 ring-1 ring-[#f4d67f]/30 backdrop-blur-sm"
+        : "bg-white/10 ring-1 ring-white/14 backdrop-blur-sm"
     }`}>
-      <p className={`text-3xl font-extrabold tabular-nums ${accent ? "text-lava-400" : "text-white"}`}>
+      <p className={`text-3xl font-extrabold tabular-nums ${accent ? "text-[#f4d67f]" : "text-white"}`}>
         {value}
       </p>
-      <p className="mt-1 text-xs font-medium text-ocean-300 uppercase tracking-wide">
+      <p className="mt-1 text-xs font-medium uppercase tracking-wide text-white/[0.68]">
         {label}
       </p>
     </div>
